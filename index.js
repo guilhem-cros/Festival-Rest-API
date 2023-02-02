@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 require("dotenv/config");
 
-app.use(cors);
+app.use(cors());
 app.use(bodyParser.json());
 
 const benevolesRoutes = require("./routes/benevoles/routes.js");
