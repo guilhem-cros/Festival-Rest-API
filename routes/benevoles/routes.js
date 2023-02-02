@@ -77,7 +77,7 @@ router.patch('/:beneId', async (req, res)=>{
  */
 router.delete('/:beneId', async (req, res)=>{
     try{
-        const removedBenevole = await Benevole.remove({_id: req.params.beneId});
+        const removedBenevole = await Benevole.deleteOne({_id: req.params.beneId});
         res.json(removedBenevole);
     } catch (err){
         res.status(404).json({message: err});
