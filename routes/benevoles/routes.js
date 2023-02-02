@@ -4,19 +4,6 @@ const Benevole = require("../../models/Benevole");
 
 
 /**
- * Route getting every benevole assigned to a specified zone
- * ordered by hours
- */
-router.get('/by_zone/:zoneId', async (req, res)=>{
-    try{
-        const benevoles = await Benevole.find(); //TODO add query pour la zone
-        res.json(benevoles);
-    } catch (err){
-        res.status(500).json({message: err});
-    }
-});
-
-/**
  * Route getting every benevoles available in the DB
  */
 router.get("/", async (req, res)=>{

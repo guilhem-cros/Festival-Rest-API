@@ -15,6 +15,18 @@ router.get("/", async (req, res)=>{
 })
 
 /**
+ * Route getting a single zone by its id
+ */
+router.get("/:zoneId", async (req, res)=>{
+    try{
+        const zone = await Zone.findById(req.params.zoneId);
+        res.json(zone);
+    }catch (err){
+        res.status(404).json({message: err});
+    }
+})
+
+/**
  * Route used to add a benevole to a specified zone
  * The fully benevole object has to be added and also the
  * hours of working on this zone
