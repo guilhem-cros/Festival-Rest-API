@@ -37,6 +37,7 @@ router.patch("/addBenevoleTo/:zoneId", async (req, res)=>{
             const toUpdateZone = await Zone.findById(req.params.zoneId);
             const benevoles = toUpdateZone.benevoles;
             benevoles.push({heureDebut: req.body.heureDebut, heureFin: req.body.heureFin, benevole: req.body.benevole});
+            benevoles.sort((benev1, benev2) => new Date(benev1.heureDebut) - new Date(benev2.heureDebut));
             const updatedZone = await Zone.updateOne(
                 {_id: req.params.zoneId},
                 {
@@ -62,6 +63,7 @@ router.patch("/addJeuTo/:zoneId", async (req, res)=>{
         const toUpdateZone = await Zone.findById(req.params.zoneId);
         const jeux = toUpdateZone.jeux;
         jeux.push(req.body.jeu);
+        jeux.sort((a,b)=>a.nom.localeCompare(b.nom));
         const updatedZone = await Zone.updateOne(
             {_id: req.params.zoneId},
             {
@@ -151,20 +153,28 @@ function removeBenevFrom(arr, id, heureDebut){
  * @param heureFin the end hour checked
  * @returns {Promise<boolean>} true if benevole is available, false if not
  */
-async function checkIfAvailableBenev(id, heureDebut, heureFin){
+async function checkIfAvailableBenev(id, heureDebut, heureFin) {
+    if(new Date(heureDebut)>new Date(heureFin)){ //si l'h de debut est supérieure à l"h de fin
+       return false
+    }
     try {
         let bool = true;
-        let i=0;
+        let i = 0;
+        const debut = new Date(heureDebut);
+        const fin = new Date(heureFin);
         const zones = await Zone.find();
-        while(bool && i<zones.length){
-            let j=0;
-            while(bool && j<zones[i].benevoles.length){
+        while (bool && i < zones.length) {
+            let j = 0;
+            while (bool && j < zones[i].benevoles.length) {
                 const benevoles = zones[i].benevoles;
-                if(benevoles[j].benevole._id.localeCompare(id)==0){
-                    if((benevoles[j].heureDebut==heureDebut && benevoles[j].heureFin==heureFin) ||
-                        (heureDebut>benevoles[j].heureDebut && heureDebut<benevoles[j].heureFin) ||
-                        (heureFin>benevoles[j].heureDebut && heureFin<benevoles[j].heureFin)){
-                        bool=false;
+                if (benevoles[j].benevole._id.localeCompare(id) == 0) {
+                    const hDebut = new Date(benevoles[j].heureDebut);
+                    const hFin = new Date(benevoles[j].heureFin);
+                    if (( hDebut== debut && hFin == fin) ||
+                        (debut > hDebut && debut < hFin) ||
+                        (fin > hDebut && fin < hFin) ||
+                        (debut<=hDebut && fin>=hFin )){
+                        bool = false;
                     }
                 }
                 j++;
@@ -172,7 +182,7 @@ async function checkIfAvailableBenev(id, heureDebut, heureFin){
             i++;
         }
         return bool;
-    }catch (err){
+    } catch (err) {
         return false;
     }
 }

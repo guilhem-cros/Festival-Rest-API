@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Jeu = require("../models/Jeu")
 
 /**
  * Schema of a zone object into the DB
