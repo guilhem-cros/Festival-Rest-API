@@ -60,19 +60,23 @@ router.patch("/addBenevoleTo/:zoneId", async (req, res)=>{
  */
 router.patch("/addJeuTo/:zoneId", async (req, res)=>{
     try{
-        const toUpdateZone = await Zone.findById(req.params.zoneId);
-        const jeux = toUpdateZone.jeux;
-        jeux.push(req.body.jeu);
-        jeux.sort((a,b)=>a.nom.localeCompare(b.nom));
-        const updatedZone = await Zone.updateOne(
-            {_id: req.params.zoneId},
-            {
-                $set:{
-                    jeux:jeux
+        if(!await checkJeuInZone(req.body.jeu._id, req.params.zoneId)) {
+            const toUpdateZone = await Zone.findById(req.params.zoneId);
+            const jeux = toUpdateZone.jeux;
+            jeux.push(req.body.jeu);
+            jeux.sort((a, b) => a.nom.localeCompare(b.nom));
+            const updatedZone = await Zone.updateOne(
+                {_id: req.params.zoneId},
+                {
+                    $set: {
+                        jeux: jeux
+                    }
                 }
-            }
-        )
-        res.json(updatedZone);
+            )
+            res.json(updatedZone);
+        } else{
+            res.status(406).json({message : "Ce jeu est déjà associé à la zone"});
+        }
     }catch (err){
         res.status(404).json({message : err});
     }
@@ -144,6 +148,23 @@ function removeBenevFrom(arr, id, heureDebut){
         }
         i++;
     }
+}
+
+/**
+ * Check if a Jeu is already in a zone
+ * @param id_jeu the id of the checked jeu
+ * @param id_zone the id of the zone in which jeu is searched
+ * @returns {Promise<boolean>} true if the jeu is in the zone, false if not
+ */
+async function checkJeuInZone(id_jeu, id_zone){
+    const zone = await Zone.findById(id_zone);
+    let ret = false;
+    zone.jeux.forEach(jeu => {
+        if (jeu._id.localeCompare(id_jeu)==0) {
+            ret = true;
+        }
+    })
+    return ret;
 }
 
 /**
