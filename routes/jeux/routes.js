@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Jeu = require("../../models/Jeu");
+const Zone = require("../../models/Zone");
+
 
 /**
  * Route getting every Jeu available in the DB
@@ -63,10 +65,35 @@ router.patch('/:jeuId', async (req, res)=>{
 router.delete('/:jeuId', async (req, res)=>{
     try{
         const removedJeu = await Jeu.deleteOne({_id: req.params.jeuId});
+        await removeJeuFromZones(req.params.jeuId);
         res.json(removedJeu);
     } catch (err){
         res.status(404).json({message: err});
     }
 })
+
+
+/**
+ * Remove a jeu by its id from every zone containing it
+ * @param idJeu the id of the jeu removed
+ * @returns {Promise<void>}
+ */
+async function removeJeuFromZones(idJeu){
+    try{
+        const zones = await Zone.find();
+        for(const zone of zones) {
+            let i = 0;
+            while (i < zone.jeux.length && zone.jeux[i].localeCompare(idJeu) != 0) {
+                i++;
+            }
+            if (i < zone.jeux.length) {
+                zone.jeux.splice(i, 1);
+                await Zone.updateOne({_id: zone._id}, {$set: {jeux: zone.jeux}})
+            }
+        }
+    }catch (err){
+        console.log(err)
+    }
+}
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Benevole = require("../../models/Benevole");
+const Zone = require("../../models/Zone");
 
 
 /**
@@ -65,10 +66,32 @@ router.patch('/:beneId', async (req, res)=>{
 router.delete('/:beneId', async (req, res)=>{
     try{
         const removedBenevole = await Benevole.deleteOne({_id: req.params.beneId});
+        await removeBenevFromZones(req.params.beneId);
         res.json(removedBenevole);
     } catch (err){
         res.status(404).json({message: err});
     }
 })
+
+/**
+ * Remove a benevole by its id from every zone containing it
+ * @param idB the id of the benevole removed
+ * @returns {Promise<void>}
+ */
+async function removeBenevFromZones(idB){
+    try{
+        const zones = await Zone.find();
+        for (const zone of zones){
+            for (const benev of zone.benevoles){
+                if(benev.benevole.localeCompare(idB)==0){
+                    zone.benevoles.remove(benev);
+                }
+            }
+            await Zone.updateOne({_id: zone._id}, {$set: {benevoles: zone.benevoles}});
+        }
+    }catch (err){
+        console.log(err)
+    }
+}
 
 module.exports = router;
