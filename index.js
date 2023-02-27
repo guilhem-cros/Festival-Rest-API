@@ -3,10 +3,12 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const middleware = require("./middleware/index")
 require("dotenv/config");
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(middleware.decodeToken)
 
 const benevolesRoutes = require("./routes/benevoles/routes.js");
 const jeuxRoutes = require("./routes/jeux/routes.js");
