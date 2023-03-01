@@ -21,6 +21,18 @@ router.get("/", async (req, res)=>{
 })
 
 /**
+ * Route getting every name and id of the zones
+ */
+router.get("/names/", async (req, res)=>{
+    try{
+        const names = await Zone.find({}, {benevoles:0, jeux:0});
+        res.json(names);
+    }catch (err){
+        res.status(500).json({message : err});
+    }
+})
+
+/**
  * Route getting a single zone by its id
  */
 router.get("/:zoneId", async (req, res)=>{
