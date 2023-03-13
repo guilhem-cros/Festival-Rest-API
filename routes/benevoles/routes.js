@@ -35,13 +35,14 @@ router.get("/:beneId", async(req, res)=>{
 router.get("/:beneId/zones", async(req, res)=>{
     try{
         const zones = await Zone.find({},{ jeux:0});
+        const benevole = await Benevole.findById(req.params.beneID);
         const creneauxBenev = [];
         for (const zone of zones) {
             for (const benev of zone.benevoles) {
                 if (benev.benevole.localeCompare(req.params.beneId) == 0) {
 
                     console.log(zone.nom)
-                    creneauxBenev.unshift({"zoneId": zone._id, "zoneName": zone.nom, "heureDebut": benev.heureDebut, "heureFin": benev.heureFin})
+                    creneauxBenev.unshift({"benevole": benevole,"zoneId": zone._id, "zoneName": zone.nom, "heureDebut": benev.heureDebut, "heureFin": benev.heureFin})
                 }
             }
         }
