@@ -35,7 +35,7 @@ router.get("/names/", async (req, res)=>{
 /**
  * Route getting every benevole available on a specified time slot
  */
-router.get("/availableBenevoles/", async(req, res)=>{
+router.post("/availableBenevoles/", async(req, res)=>{
     try {
         const benevoles = await Benevole.find();
         const availableBenevs = [];
