@@ -33,6 +33,24 @@ router.get("/names/", async (req, res)=>{
 })
 
 /**
+ * Route getting every benevole available on a specified time slot
+ */
+router.get("/availableBenevoles/", async(req, res)=>{
+    try {
+        const benevoles = await Benevole.find();
+        const availableBenevs = [];
+        for (const benev of benevoles) {
+            if (await checkIfAvailableBenev(benev._id, req.body.heureDebut, req.body.heureFin)) {
+                availableBenevs.push(benev);
+            }
+        }
+        res.json(availableBenevs);
+    }catch (err){
+        res.status(500).json({message: err});
+    }
+})
+
+/**
  * Route getting a single zone by its id
  */
 router.get("/:zoneId", async (req, res)=>{
