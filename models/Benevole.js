@@ -15,7 +15,23 @@ const BenevoleSchema = mongoose.Schema({
     },
     email:{
         type: String,
+        required: true,
+        unique: true
+    },
+    firebaseID:{
+        type: String,
+        required: true,
+        unique: true,
+        default : "none"
+    },
+    dispo: {
+        type : Array,
         required: true
+    },
+    admin: {
+        type: Boolean,
+        required: true,
+        default : false
     }
 })
 

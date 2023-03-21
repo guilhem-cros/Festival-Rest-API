@@ -17,6 +17,11 @@ const ZoneSchema = mongoose.Schema({
     jeux:{
         type: [{}],
         required: true
+    },
+    nbBenevNecessaire: {
+        type: Number,
+        default : 10,
+        required: true
     }
 });
 
