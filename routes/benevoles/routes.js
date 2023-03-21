@@ -1,6 +1,7 @@
 const express = require("express");
 const benevolesRoutes = express.Router();
 const Benevole = require("../../models/Benevole");
+const Zone = require("../../models/Zone")
 const authMiddleware = require('../../middleware/index');
 const {checkIfAvailableBenev} = require("../zones/routes")
 
