@@ -13,7 +13,7 @@ benevolesRoutes.use(authMiddleware);
 benevolesRoutes.get("/byUID/:uid", async(req, res)=>{
     try{
         const benevole = await Benevole.find({firebaseID: req.params.uid})
-        res.json(benevole);
+        res.json(benevole[0]);
     }catch (err){
         res.status(404).json({message: err});
     }
