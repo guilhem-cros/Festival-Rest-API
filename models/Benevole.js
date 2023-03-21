@@ -25,7 +25,7 @@ const BenevoleSchema = mongoose.Schema({
         default : "none"
     },
     dispo: {
-        type : Array,
+        type : [[]],
         required: true
     },
     admin: {
