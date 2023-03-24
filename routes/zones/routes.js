@@ -5,7 +5,50 @@ const Benevole = require("../../models/Benevole");
 const Jeu = require("../../models/Jeu");
 const authMiddleware = require("../../middleware");
 
+const freeZoneID = "641b1fbd01df06d6d87caa11"
+
 zonesRoutes.use(authMiddleware);
+
+// Route for creating a new zone
+zonesRoutes.post("/", async (req, res) => {
+    if(await isAdmin(req.user.uid)) {
+        try {
+            const zone = new Zone({
+                nom: req.body.nom,
+                benevoles: [],
+                jeux: [],
+                nbBenevNecessaire: req.body.nbBenevNecessaire
+            });
+            const savedZone = await zone.save();
+            res.json(savedZone);
+        } catch (err) {
+            res.json({message: err});
+        }
+    }else{
+        res.status(401).json({message: "Unauthorized"})
+    }
+});
+
+// Route for updating a zone by ID
+zonesRoutes.patch("/:id", async (req, res) => {
+    if(await isAdmin(req.user.uid) && req.params.id.localeCompare(freeZoneID)!==0) {
+        try {
+            const updatedZone = await Zone.findByIdAndUpdate(
+                req.params.id,
+                {
+                    nom: req.body.nom,
+                    nbBenevNecessaire: req.body.nbBenevNecessaire
+                },
+                {new: true}
+            );
+            res.json(updatedZone);
+        } catch (err) {
+            res.json({message: err.message})
+        }
+    }else{
+        res.status(401).json({message: "Unauthorized"})
+    }
+})
 
 /**
  * Route getting every zones available in the DB
@@ -384,7 +427,7 @@ async function hasFreeSlot(idBenev, hDebut, hFin){
 async function isAdmin(uid){
     try {
         const benevole = await Benevole.find({firebaseID: uid});
-        return benevole.admin;
+        return benevole[0].admin;
     }catch (err){
         console.log(err)
         return false;
