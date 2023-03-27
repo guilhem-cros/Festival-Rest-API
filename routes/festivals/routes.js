@@ -34,6 +34,10 @@ router.post('/', async (req, res) => {
                 zones: [],
             });
             const newFestival = await festival.save();
+            let zones= [];
+            const freeZone = await Zone.findById(freeZoneID, {jeux:0})
+            zones.push(freeZone)
+            newFestival.zones=zones;
             res.status(201).json(newFestival);
         } catch (err) {
             res.status(400).json({message: err.message});
