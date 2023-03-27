@@ -181,6 +181,8 @@ async function fillZones(arr){
         zones.push(freeZone);
         for(const value of arr){
             const zone = await Zone.findById(value, {jeux: 0});
+            const benevoles = await fillBenevole(zone.benevoles)
+            zone.benevoles = benevoles
             zones.push(zone)
         }
         return zones;
@@ -198,4 +200,19 @@ async function isAdmin(uid){
         return false;
     }
 }
+
+
+async function fillBenevole(arr){
+    try {
+        let benevoles = [];
+        for(const value of arr){
+            const benevole = await Benevole.findById(value.benevole);
+            benevoles.push({heureDebut : value.heureDebut, heureFin :value.heureFin, benevole : benevole})
+        }
+        return benevoles
+    }catch (err){
+        return [];
+    }
+}
+
 module.exports = router;
