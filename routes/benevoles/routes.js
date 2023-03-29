@@ -90,7 +90,7 @@ benevolesRoutes.post('/', async(req, res)=>{
  */
 benevolesRoutes.patch('/:beneId', async (req, res)=>{
     try {
-        if(await isConnected(req.params.beneId, req.user.uid) || await isAdmin(req.params.beneId)){
+        if(await isConnected(req.params.beneId, req.user.uid) || await isAdmin(req.user.uid)){
             const updatedBenevole = await Benevole.updateOne(
                 {_id: req.params.beneId},
                 {$set: {nom: req.body.nom, prenom: req.body.prenom}}
@@ -161,6 +161,7 @@ benevolesRoutes.patch('/:beneId/removeSlot', async(req, res)=>{
 benevolesRoutes.delete('/:beneId', async (req, res)=>{
     try{
         if(await isAdmin(req.user.uid)) {
+            console.log(1)
             const removedBenevole = await Benevole.deleteOne({_id: req.params.beneId});
             await removeBenevFromZones(req.params.beneId);
             res.json(removedBenevole);
@@ -183,10 +184,10 @@ async function isConnected(idB, uid){
     }
 }
 
-async function isAdmin(idB){
+async function isAdmin(uid){
     try {
-        const benev = await Benevole.findById(idB);
-        return benev.admin;
+        const benevole = await Benevole.find({firebaseID: uid});
+        return benevole[0].admin;
     }catch (err){
         console.log(err)
         return false;
